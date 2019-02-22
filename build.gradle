@@ -1,0 +1,33 @@
+plugins {
+    id 'scala'
+    id 'java'
+    id 'idea'
+}
+
+group 'com.gree'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'scala'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation ('org.apache.spark:spark-sql_2.11:2.3.0')
+    implementation ('org.apache.spark:spark-hive_2.11:2.3.0')
+    implementation 'org.apache.spark:spark-streaming_2.11:2.3.0'
+    implementation 'org.apache.spark:spark-core_2.11:2.3.0'
+    implementation 'org.apache.kudu:kudu-spark2_2.11:1.7.0'
+    implementation 'org.apache.spark:spark-streaming-kafka-0-10_2.11:2.3.0'
+    implementation group: 'com.alibaba', name: 'fastjson', version: '1.1.15'
+    implementation 'org.projectlombok:lombok:1.16.22'
+    //    compile "org.apache.hive:hive-jdbc:1.1.0-cdh5.15.1"
+//    compile ('org.apache.hive:hive-jdbc:3.1.1') {
+//        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+//    }
+    implementation 'org.apache.hive:hive-jdbc:1.1.0'
+
+}
