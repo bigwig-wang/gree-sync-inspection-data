@@ -3,13 +3,13 @@ package com.gree
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{StructType, _}
 import org.scalatest.{BeforeAndAfter, FlatSpec}
-
+L
 
 class ExcelTest extends FlatSpec with BeforeAndAfter {
 
   var spark: SparkSession = _
 
-  val path = "/Users/wei.qi/workspace/tw_work/gree/gree-sync-inspection-data/data/科室物料组对应表.xlsx"
+  val path = "/Users/wei.qi/workspace/tw_work/gree/gree-sync-inspection-data/data/科室物料组对应表s.xlsx"
 
   val customSchema = StructType(Array(
     StructField("Keshi", StringType, nullable = false),
