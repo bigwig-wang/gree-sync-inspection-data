@@ -148,7 +148,7 @@ object KafkaConsumer {
 
 
   def getRecord(record: String): List[ApiInspection] = {
-    println("===================="+record)
+    println("===================="+record+"======")
     implicit val formats = new DefaultFormats {
       override def dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
     } + new NumberSerializer() + new DoubleSerializer() + new TimeSerializer()

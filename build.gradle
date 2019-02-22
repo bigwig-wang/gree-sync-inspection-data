@@ -28,5 +28,4 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.16.22'
     implementation 'com.crealytics:spark-excel_2.11:0.11.1'
     implementation 'org.apache.hive:hive-jdbc:1.1.0'
-
 }
