@@ -9,7 +9,7 @@ import org.apache.hadoop.security.UserGroupInformation
 object KerberosInitConfig {
 
   def initKerberos():Unit = {
-    val in = StatementSingleton.getClass.getClassLoader.getResourceAsStream("kerberos.properties")
+    val in = StatementSingleton.getClass.getClassLoader.getResourceAsStream("gree/kerberos.properties")
     val properties = new Properties()
     properties.load(in)
 
@@ -19,7 +19,7 @@ object KerberosInitConfig {
 
     System.setProperty("java.security.krb5.conf", krb5Location)
     try {
-      val configuration = new Configuration();
+      val configuration = new Configuration()
       configuration.set("hadoop.security.authentication" , "Kerberos" )
       UserGroupInformation.setConfiguration(configuration)
       UserGroupInformation.loginUserFromKeytab(kerberosUser, keytabLocation)

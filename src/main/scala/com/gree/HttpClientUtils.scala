@@ -16,9 +16,9 @@ object HttpClientUtils {
     EntityUtils.toString(entity, "UTF-8")
   }
 
-  def deal_params(computer: Integer, startTime: String,
-                  endTime: String, skipCount: Integer, maxResult: Integer): Unit = {
-    val sb = new StringBuilder("http://localhost:8080/hello")
+  def get_with_params(url: String, computer: Integer, startTime: String,
+                      endTime: String, skipCount: Integer, maxResult: Integer): String = {
+    val sb = new StringBuilder(url)
     //Computer  公司或基地 郑州格力:1 石家庄格力:2 武汉格力:3 长沙格力:4 珠海格力:5 芜湖格力:6 重庆格力:7 合肥格力:8 interger
     // StartDateTime 开始日期 yyyy-MM-dd string
     //EndDateTime 结束日期 yyyy-MM-dd  string
@@ -30,7 +30,7 @@ object HttpClientUtils {
     sb.append(startTime)
     sb.append("&EndDateTime=")
     sb.append(endTime)
-    sb.append("&skipCount=")
+    sb.append("&SkipCount=")
     sb.append(skipCount)
     sb.append("&MaxResultCount=")
     sb.append(maxResult)
@@ -38,7 +38,13 @@ object HttpClientUtils {
   }
 
   def main(args: Array[String]): Unit = {
-    get("http://localhost:8080/hello")
+    val url = "http://sysapp.gree.com/GreeMesOpenApi/GreeMesApi/api/services/app/MesQCData/GetQCDatas"
+    val computer: Integer = 4
+    val startDateTime: String = "2018-09-01"
+    val endDateTime: String = "2018-09-02"
+    val skipCount: Integer = 1
+    val maxResultCount: Integer = 1000
+    print(get_with_params(url, computer, startDateTime, endDateTime, skipCount, maxResultCount))
   }
 
 }

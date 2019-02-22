@@ -39,7 +39,10 @@ case class SampleInspection(vendor_name: String, //enterprisename
 
                             duty_company: String, //responsibleorganization
                             business_user: String, //purchasercode
-                            remark: String)
+                            remark: String,
+                            create_time: Timestamp,
+                            update_time: Timestamp
+                           )
 //remarks
 
 case class FullInspection(vendor_name: String,
@@ -65,7 +68,9 @@ case class FullInspection(vendor_name: String,
                           unqualified_reason_code: String,
                           unqualified_reason_name: String,
                           unqualified_amount: Double,
-                          unqualified_rate: Double
+                          unqualified_rate: Double,
+                          create_time: Timestamp,
+                          update_time: Timestamp
                           )
 
 case class ApiInspection(categoryname: String,

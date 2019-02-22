@@ -14,7 +14,7 @@ object KuduContextSingleton {
   def getInstance(): KuduContext = {
 
     if(instance == null) {
-      val in = KuduContextSingleton.getClass.getClassLoader.getResourceAsStream("kafka.properties")
+      val in = KuduContextSingleton.getClass.getClassLoader.getResourceAsStream("gree/kafka.properties")
       val properties = new Properties()
       properties.load(in)
 

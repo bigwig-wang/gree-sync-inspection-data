@@ -10,7 +10,7 @@ object StatementSingleton {
   def getInstance(): Statement = {
 
     if(statement == null) {
-      val in = StatementSingleton.getClass.getClassLoader.getResourceAsStream("jdbc.properties")
+      val in = StatementSingleton.getClass.getClassLoader.getResourceAsStream("gree/jdbc.properties")
       val properties = new Properties()
       properties.load(in)
 

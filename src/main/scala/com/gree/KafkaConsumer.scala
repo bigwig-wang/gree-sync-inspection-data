@@ -2,7 +2,9 @@ package com.gree
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
+import java.util.{Date, Properties}
 
+import com.gree.KafkaProducer.KafkaProducerConfigs
 import org.apache.commons.lang3.StringUtils
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
@@ -40,57 +42,47 @@ object KafkaConsumer {
   }
   ))
 
-  def streaming(): Unit = {
-    val updateFunc = (values: Seq[Int], state: Option[Int]) => {
-      val currentCount = values.foldLeft(0)(_ + _)
-      val previousCount = state.getOrElse(0)
-      Some(currentCount + previousCount)
-    }
-    //创建StreamingContext
-    val conf = new SparkConf().setMaster("local[*]").setAppName("StreamTest")
-    val sc = new StreamingContext(conf, Seconds(5))
-    sc.checkpoint("/Users/dhwang/gree/cdh/kk/")
+  case class KafkaConsumerConfigs() {
+    val in = KafkaProducerConfigs.getClass.getClassLoader.getResourceAsStream("gree/kafka.properties")
+    val properties = new Properties()
+    properties.load(in)
 
-    val lines = sc.socketTextStream("localhost", 9999)
-    val words = lines.flatMap(_.split(" "))
-    val wordDstream = words.map(x => (x, 1))
-    val stateDstream = wordDstream.updateStateByKey[Int](updateFunc)
-    stateDstream.print()
-    sc.start()
-    sc.awaitTermination()
-  }
+    private val krb5Location: String = properties.getProperty("kerberos.krb5.location")
+    private val kafkaLoginConfigLocation: String = properties.getProperty("kafka.login.config.location")
+    private val brokerList: String = properties.getProperty("kafka.brokers")
+    private val kafkaTopics: String = properties.getProperty("kafka.topics")
+    private val kafkaServiceName: String = properties.getProperty("kafka.sasl.kerberos.service.name")
+    private val kafkaSecurityProtocol: String = properties.getProperty("kafka.security.protocol")
+    private val groupId: String = properties.getProperty("kafka.group.id")
 
-
-  def kafka_streaming(): Unit = {
-    System.setProperty("java.security.krb5.conf", "/Users/dhwang/gree/cdh/keytab/krb5.conf")
-    System.setProperty("java.security.auth.login.config", "/Users/dhwang/gree/cdh/keytab/jaas-cache.conf")
+    System.setProperty("java.security.krb5.conf", krb5Location)
+    System.setProperty("java.security.auth.login.config", kafkaLoginConfigLocation)
     System.setProperty("javax.security.auth.useSubjectCredsOnly", "false")
-    val brokers = "dhwang1:9092"
-    val topics = "test"
 
-    println("kafka.brokers:" + brokers)
-    println("kafka.topics:" + topics)
-    if (StringUtils.isEmpty(brokers) || StringUtils.isEmpty(topics)) {
+    if (StringUtils.isEmpty(brokerList) || StringUtils.isEmpty(kafkaTopics)) {
       println("未配置Kafka信息")
       System.exit(0)
     }
-    val topicsSet = topics.split(",").toSet
+    val topicsSet = kafkaTopics.split(",").toSet
     val spark = SparkSession.builder().appName("GreeKuduStreaming").master("local[2]").getOrCreate()
     val ssc = new StreamingContext(spark.sparkContext, Seconds(30)) //设置Spark时间窗口，每5s处理一次
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> brokers
+      "bootstrap.servers" -> brokerList
       , "key.deserializer" -> classOf[StringDeserializer]
       , "value.deserializer" -> classOf[StringDeserializer]
-      , "group.id" -> "1"
+      , "group.id" -> groupId
       , "auto.offset.reset" -> "latest"
       , "enable.auto.commit" -> (true: java.lang.Boolean)
-      , "security.protocol" -> "SASL_PLAINTEXT"
-      , "sasl.kerberos.service.name" -> "kafka"
+      , "security.protocol" -> kafkaSecurityProtocol
+      , "sasl.kerberos.service.name" -> kafkaServiceName
     )
+  }
 
+  def kafka_streaming(): Unit = {
+    val ssc = KafkaConsumerConfigs().ssc
     val dStream = KafkaUtils.createDirectStream[String, String](ssc,
       LocationStrategies.PreferConsistent,
-      ConsumerStrategies.Subscribe[String, String](topicsSet, kafkaParams))
+      ConsumerStrategies.Subscribe[String, String](KafkaConsumerConfigs().topicsSet, KafkaConsumerConfigs().kafkaParams))
 
     dStream.map(_.value()).foreachRDD { rdd: RDD[String] =>
       if(rdd.count() > 0){
@@ -105,8 +97,8 @@ object KafkaConsumer {
 
         //kudu 插入数据
         val kuduContext = KuduContextSingleton.getInstance()
-        kuduContext.insertRows(sampleDF, "impala::test.sample_inspection")
-        kuduContext.insertRows(fullDF, "impala::test.full_inspection")
+        kuduContext.insertRows(sampleDF, "impala::gree.sample_inspection")
+        kuduContext.insertRows(fullDF, "impala::gree.full_inspection")
       }
     }
     ssc.start()
@@ -122,7 +114,8 @@ object KafkaConsumer {
       f.qcquantity, f.failquantity, f.passquantity,
       handler.get_base_code("1"), handler.get_base_name("1"), handler.get_department_code("1"), handler.get_department_name("1"),
       handler.get_is_commute(f.finalcertified), f.receivedquantity, f.delivereddate, f.sjremarks, f.deliveryorderno,
-      f.failcode, "抽检不合格原因", f.responsibleorganization, f.purchasercode, f.remarks)
+      f.failcode, "抽检不合格原因", f.responsibleorganization, f.purchasercode, f.remarks,
+      new Timestamp(new Date().getTime), new Timestamp(new Date().getTime))
   }
 
 
@@ -135,7 +128,8 @@ object KafkaConsumer {
       f.qcquantity, f.failquantity,
       f.passquantity, handler.get_total_unqualified_rate(),
       handler.get_unqualified_reason_code(f.failreasoncode), handler.get_unqualified_reason_name(f.failreasoncode),
-      6.0, handler.get_unqualified_rate_for_reason)
+      6.0, handler.get_unqualified_rate_for_reason,
+      new Timestamp(new Date().getTime), new Timestamp(new Date().getTime))
   }
 
   private def get_full_data(s: ApiInspection) = {
@@ -155,5 +149,4 @@ object KafkaConsumer {
     val fi: List[ApiInspection] = (parse(record) \ "result" \ "items").extract[List[ApiInspection]]
     fi
   }
-
 }

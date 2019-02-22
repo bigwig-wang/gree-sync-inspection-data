@@ -10,7 +10,7 @@ import org.apache.kafka.common.serialization.StringSerializer
 object KafkaProducer {
 
   case class KafkaProducerConfigs() {
-    val in = KafkaProducerConfigs.getClass.getClassLoader.getResourceAsStream("kafka.properties")
+    val in = KafkaProducerConfigs.getClass.getClassLoader.getResourceAsStream("gree/kafka.properties")
     val properties = new Properties()
     properties.load(in)
 

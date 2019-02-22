@@ -27,7 +27,7 @@ object DictionaryHandler extends Serializable {
     val sparkConf = new SparkConf().setMaster("local").setAppName("GreeKuduStreaming")
     val sparkSession = SparkSessionSingleton.getInstance(sparkConf)
 
-    val rs = statement.executeQuery(new StringBuilder("select * from test.material_group").toString())
+    val rs = statement.executeQuery(new StringBuilder("select * from material_group").toString())
     var map: Map[String,String] = Map()
     while (rs.next()) {
       map += (rs.getString(1) -> rs.getString(2))
@@ -40,7 +40,7 @@ object DictionaryHandler extends Serializable {
     val sparkConf = new SparkConf().setMaster("local").setAppName("GreeKuduStreaming")
     val sparkSession = SparkSessionSingleton.getInstance(sparkConf)
 
-    val rs = statement.executeQuery(new StringBuilder("select * from test.material_group").toString())
+    val rs = statement.executeQuery(new StringBuilder("select * from unqualified_reason").toString())
     var map: Map[String,String] = Map()
     while (rs.next()) {
       map += (rs.getString(1) -> rs.getString(2))
