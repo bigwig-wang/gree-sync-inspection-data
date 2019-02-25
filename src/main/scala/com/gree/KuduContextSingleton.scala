@@ -19,9 +19,7 @@ object KuduContextSingleton {
       properties.load(in)
 
       val kuduMaster: String = properties.getProperty("kudu.master")
-
-      val sparkConf = new SparkConf().setMaster("local").setAppName("GreeKuduStreaming")
-      val spark = SparkSessionSingleton.getInstance(sparkConf)
+      val spark = SparkSessionSingleton.getInstance(SparkSessionSingleton.getSparkConf())
       instance = UserGroupInformation.getLoginUser.doAs(new PrivilegedExceptionAction[KuduContext]() {
         @throws[Exception]
         override def run: KuduContext = new KuduContext(kuduMaster, spark.sparkContext)

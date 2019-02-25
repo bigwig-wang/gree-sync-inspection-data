@@ -2,8 +2,8 @@ package com.gree
 
 import java.util.regex.Pattern
 
-import com.gree.DictionaryHandler.materialGroupBroadcastInstance
-import org.apache.commons.lang3.StringUtils
+import com.gree.DictionaryHandler._
+import org.apache.spark.sql.Row
 
 class FieldHandler extends Serializable {
 
@@ -16,6 +16,14 @@ class FieldHandler extends Serializable {
       return materialGroupMap(materialGroupCode)
     }
     return "找不到对应物料组名"
+  }
+
+  def get_unqualified_reason_name_by_code(unqualifiedReasonCode: String): String = {
+    val unqualifiedReasonMap = unqualifiedReasonBroadcastInstance.value
+    if (unqualifiedReasonMap.contains(unqualifiedReasonCode)) {
+      return unqualifiedReasonMap(unqualifiedReasonCode)
+    }
+    return "找不到对应不合格原因"
   }
 
   def get_inspection_conclusion(lastcertified: String): String = {
@@ -41,39 +49,81 @@ class FieldHandler extends Serializable {
     username.replaceAll(reg, "")
   }
 
-  def get_base_code(code: String): String = {
-    "基地code"
+  def get_base(mappingCode: String): Row = {
+    var row: Row = null
+    val base = baseCodeBroadcastInstance.value.filter("mapping_code=" + mappingCode)
+      .select("base_code", "base_name")
+    if (base.count() > 0) {
+      row = base.first()
+    }
+    row
   }
 
-  def get_base_name(code: String): String = {
-    "基地名字"
+  def get_base_code(row: Row): String = {
+    var baseCode = ""
+    if(row != null) {
+      baseCode = row.getString(0)
+    }
+    baseCode
   }
 
-  def get_department_code(code: String): String = {
-    "部门code"
+  def get_base_name(row: Row): String = {
+    var baseName = ""
+    if(row != null) {
+      baseName = row.getString(1)
+    }
+    baseName
   }
 
-  def get_department_name(code: String): String = {
-    "部门名字"
+  def get_department_code(row: Row): String = {
+    var departmentCode = ""
+    if(row != null) {
+      departmentCode = row.getString(0)
+    }
+    departmentCode
   }
 
-  def get_total_unqualified_rate(): Double = {
-    0.00
+  def get_department_name(row: Row): String = {
+    var departmentName = ""
+    if(row != null) {
+      departmentName = row.getString(1)
+    }
+    departmentName
   }
 
-  def get_unqualified_reason_code(code: String): String = {
-    if (StringUtils.isBlank(code)) return "code"
-    code
+  //对于历史数据的处理
+  def get_department(materialGroupCode: String, inspectorCode: String): Row = {
+    var row: Row = null
+    val matchDepartment = materialGroupDepartmentBroadcastInstance
+      .value.filter("material_group_code=" + materialGroupCode)
+      .select("department_code", "department_name")
+
+    if (matchDepartment.count() == 0) {
+      //根据检验员来查
+      val matchInspectorDepartment = inspectorDepartmentBroadcastInstance
+        .value.filter("inspector_code=" + inspectorCode)
+        .select("department_code", "department_name")
+      if (matchInspectorDepartment.count() > 0) {
+        row = matchInspectorDepartment.first()
+      }
+    } else {
+      row = matchDepartment.first()
+    }
+    row
   }
 
-  def get_unqualified_reason_name(code: String): String = {
-    "不合格原因"
+  //对于新数据的处理
+  def get_department_for_new_data(inspectorCode: String): Row = {
+    var row: Row = null
+    //根据检验员来查
+    val matchInspectorDepartment = inspectorDepartmentBroadcastInstance
+      .value.filter("inspector_code=" + inspectorCode)
+      .select("department_code", "department_name")
+    if (matchInspectorDepartment.count() > 0) {
+      row = matchInspectorDepartment.first()
+    }
+    row
   }
-
-  def get_unqualified_rate_for_reason(): Double = {
-    100.0
-  }
-
 
   def get_is_commute(isCommute: String): Boolean = {
     "1".equals(isCommute)

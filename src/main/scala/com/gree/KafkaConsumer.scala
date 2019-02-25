@@ -7,7 +7,6 @@ import java.util.{Date, Properties}
 import com.gree.KafkaProducer.KafkaProducerConfigs
 import org.apache.commons.lang3.StringUtils
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
@@ -107,28 +106,36 @@ object KafkaConsumer {
 
   private def assemblySampleData(f: ApiInspection): SampleInspection = {
     val handler = new FieldHandler()
+    val departmentRow = handler.get_department("1" ,"1")
+    val baseRow = handler.get_department("1" ,"1")
+
     SampleInspection(f.enterprisename, f.description, f.partname, f.partcode,
       f.categoryname, handler.get_material_group_name_by_code(f.categoryname),
       f.mlotno, f.faillevel, f.qcmodename, f.statename, handler.get_inspection_conclusion(f.lastcertified),
       handler.get_inspector_code(f.username), handler.get_inspector_name(f.username), f.executeddate,
       f.qcquantity, f.failquantity, f.passquantity,
-      handler.get_base_code("1"), handler.get_base_name("1"), handler.get_department_code("1"), handler.get_department_name("1"),
+      handler.get_base_code(baseRow), handler.get_base_name(baseRow),
+      handler.get_department_code(departmentRow), handler.get_department_name(departmentRow),
       handler.get_is_commute(f.finalcertified), f.receivedquantity, f.delivereddate, f.sjremarks, f.deliveryorderno,
-      f.failcode, "抽检不合格原因", f.responsibleorganization, f.purchasercode, f.remarks,
+      f.failcode, handler.get_unqualified_reason_name_by_code(f.failcode), f.responsibleorganization, f.purchasercode, f.remarks,
       new Timestamp(new Date().getTime), new Timestamp(new Date().getTime))
   }
 
 
   private def assemblyFullData(f: ApiInspection): FullInspection = {
     val handler = new FieldHandler()
+    val departmentRow = handler.get_department("1" ,"1")
+    val baseRow = handler.get_department("1" ,"1")
+
     FullInspection(f.enterprisename, f.description, f.partname, f.partcode,
       f.categoryname, handler.get_material_group_name_by_code(f.categoryname),
       f.mlotno, f.faillevel, f.executeddate,
-      handler.get_base_code("1"), handler.get_base_name("1"), handler.get_department_code("1"), handler.get_department_name("1"),
+      handler.get_base_code(baseRow), handler.get_base_name(baseRow),
+      handler.get_department_code(departmentRow), handler.get_department_name(departmentRow),
       f.qcquantity, f.failquantity,
-      f.passquantity, handler.get_total_unqualified_rate(),
-      handler.get_unqualified_reason_code(f.failreasoncode), handler.get_unqualified_reason_name(f.failreasoncode),
-      6.0, handler.get_unqualified_rate_for_reason,
+      f.passquantity, f.passquantity/f.qcquantity,
+      f.failreasoncode, handler.get_unqualified_reason_name_by_code(f.failreasoncode), 6.0,
+      f.,
       new Timestamp(new Date().getTime), new Timestamp(new Date().getTime))
   }
 
