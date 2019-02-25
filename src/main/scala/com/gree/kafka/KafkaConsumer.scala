@@ -1,10 +1,12 @@
-package com.gree
+package com.gree.kafka
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 
-import com.gree.KafkaProducer.KafkaProducerConfigs
+import KafkaProducer.KafkaProducerConfigs
+import com.gree._
+import com.gree.singleton.{KuduContextSingleton, SparkSessionSingleton}
 import org.apache.commons.lang3.StringUtils
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.rdd.RDD
@@ -135,7 +137,7 @@ object KafkaConsumer {
       f.qcquantity, f.failquantity,
       f.passquantity, f.passquantity/f.qcquantity,
       f.failreasoncode, handler.get_unqualified_reason_name_by_code(f.failreasoncode), 6.0,
-      f.,
+      f.failquantity,
       new Timestamp(new Date().getTime), new Timestamp(new Date().getTime))
   }
 

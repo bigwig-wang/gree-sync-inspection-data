@@ -3,6 +3,7 @@ package com.gree
 import java.io.IOException
 import java.util.Properties
 
+import com.gree.singleton.StatementSingleton
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.security.UserGroupInformation
 

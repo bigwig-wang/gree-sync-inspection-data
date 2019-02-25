@@ -1,11 +1,10 @@
-package com.gree
+package com.gree.singleton
 
 import java.security.PrivilegedExceptionAction
 import java.util.Properties
 
 import org.apache.hadoop.security.UserGroupInformation
 import org.apache.kudu.spark.kudu.KuduContext
-import org.apache.spark.SparkConf
 
 object KuduContextSingleton {
 

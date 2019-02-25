@@ -1,5 +1,8 @@
 package com.gree
 
+import com.gree.kafka.KafkaConsumer
+import com.gree.singleton.StatementSingleton
+
 object Main {
 
   def main(args: Array[String]): Unit = {

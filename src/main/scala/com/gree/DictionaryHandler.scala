@@ -1,9 +1,10 @@
 package com.gree
 
+import com.gree.singleton.{SparkSessionSingleton, StatementSingleton}
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.DataFrame
-import com.gree.utils.GreeConstants.{materialGroupDepartmentExcelPath, inspectorDepartmentExcelPath,
-  baseExcelPath, materialGroupSqlStatement, unqualifiedReasonSqlStatement}
+import com.gree.utils.GreeConstants.{baseExcelPath, inspectorDepartmentExcelPath, materialGroupDepartmentExcelPath, materialGroupSqlStatement, unqualifiedReasonSqlStatement}
+import com.gree.utils.SparkExcelUtils
 
 object DictionaryHandler extends Serializable {
   var materialGroupBroadcastInstance: Broadcast[Map[String,String]] = _
@@ -19,7 +20,7 @@ object DictionaryHandler extends Serializable {
   var baseCodeBroadcastInstance: Broadcast[DataFrame] = _
 
   def init_base_code: Unit = {
-    val service = SparkExcelUtil.apply
+    val service = SparkExcelUtils.apply
     val df = service.read(SparkSessionSingleton.getInstance(
       SparkSessionSingleton.getSparkConf()), materialGroupDepartmentExcelPath
       )
@@ -32,7 +33,7 @@ object DictionaryHandler extends Serializable {
 
   def init_inspector_and_department: Unit = {
     //inspectorCode => (departmentCode, departmentName)
-    val service = SparkExcelUtil.apply
+    val service = SparkExcelUtils.apply
     val df = service.read(SparkSessionSingleton.getInstance(
       SparkSessionSingleton.getSparkConf()), inspectorDepartmentExcelPath
       )
@@ -46,7 +47,7 @@ object DictionaryHandler extends Serializable {
 
   def init_material_group_and_department: Unit = {
     //materialGroupCode => (departmentCode, departmentName)
-    val service = SparkExcelUtil.apply
+    val service = SparkExcelUtils.apply
     val df = service.read(SparkSessionSingleton.getInstance(
       SparkSessionSingleton.getSparkConf()), baseExcelPath
       )
