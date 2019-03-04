@@ -25,8 +25,8 @@ case class SampleInspection(vendor_name: String, //enterprisename
 
                             base_code: String, //
                             base_name: String, //
-                            department_code: String, //
-                            department_name: String, //
+                            department_code: String="", //
+                            department_name: String="", //
 
                             is_commute: Boolean, //finalcertified
                             receiving_amount: Double, //receivedquantity
@@ -34,8 +34,8 @@ case class SampleInspection(vendor_name: String, //enterprisename
                             parts_batch_no: String, //sjremarks
                             sending_no: String, //deliveryorderno
 
-                            unqualified_reason_code: String, //failcode
-                            unqualified_reason_name: String,
+                            unqualified_reason_code: String="none", //failcode
+                            unqualified_reason_name: String="none",
 
                             duty_company: String, //responsibleorganization
                             business_user: String, //purchasercode
@@ -43,6 +43,7 @@ case class SampleInspection(vendor_name: String, //enterprisename
                             create_time: Timestamp,
                             update_time: Timestamp
                            )
+
 //remarks
 
 case class FullInspection(vendor_name: String,
@@ -57,21 +58,21 @@ case class FullInspection(vendor_name: String,
                           inspection_time: Timestamp,
                           base_code: String,
                           base_name: String,
-                          department_code: String,
-                          department_name: String,
+                          department_code: String="",
+                          department_name: String="",
 
                           total_amount: Double,
                           total_unqualified_amount: Double,
                           total_qualified_amount: Double,
                           qualified_rate: Double,
 
-                          unqualified_reason_code: String,
-                          unqualified_reason_name: String,
+                          unqualified_reason_code: String="none",
+                          unqualified_reason_name: String="none",
                           unqualified_amount: Double,
                           unqualified_rate: Double,
                           create_time: Timestamp,
                           update_time: Timestamp
-                          )
+                         )
 
 case class ApiInspection(categoryname: String,
                          partname: String,
@@ -99,4 +100,8 @@ case class ApiInspection(categoryname: String,
                          sjremarks: String,
                          failreasoncode: String,
                          failcode: String
+                        )
+
+case class InspectionBase(basecode: String,
+                          inspection: ApiInspection
                          )
